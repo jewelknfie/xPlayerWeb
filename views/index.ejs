@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title><%= title %></title>
+        <link rel='stylesheet' href='/stylesheets/style.css' />
+        <link href="/stylesheets/bootstrap-responsive.min.css" rel="stylesheet">
+        <link href="/stylesheets/bootstrap.min.css" rel="stylesheet">
+        <!--<link href="/css/layoutit.css" rel="stylesheet">-->
+        <script type="text/javascript" src="http://www.bootcss.com/p/layoutit/js/jquery-2.0.0.min.js"></script>
+        <script type="text/javascript" src="/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/js/fuc.js"></script>
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span12">
+                    <ul class="nav nav-pills">
+                        <li class="active">
+                            <a href="#">首页</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span2">
+                    <ul class="nav nav-list">
+                        <li class="nav-header">
+                            视频列表
+                        </li>
+                        <li class="active">
+                            <a href="javascript:showPlayer(this, '冰与火之歌','1.mp4');">冰与火之歌</a>
+                        </li>
+                        <li>
+                            <a href="javascript:showPlayer(this, '黑吃黑','2.mp4');">黑吃黑</a>
+                        </li>
+                        <li>
+                            <a href="javascript:showPlayer(this, '非常突然','3.mp4');">非常突然</a>
+                        </li>
+                        <li class="nav-header">
+                            功能列表
+                        </li>
+                        <li>
+                            <a href="#">资料</a>
+                        </li>
+                        <li>
+                            <a href="#">设置</a>
+                        </li>
+                        <li class="divider">
+                        </li>
+                        <li>
+                            <a href="#">帮助</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="span6">
+                    <div class="media">
+                        <a href="#" class="pull-left"><img src="img/a_002.jpg" class="media-object" alt='' /></a>
+                        <div class="media-body">
+                            <h4 class="media-heading">
+                                嵌入媒体标题
+                            </h4> 
+                            <video id="vplayer" src=""  controls autoplay loop>
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                    </div>
+                </div>
+                <div class="span4">
+                    <dl>
+                        <dt>
+                        Rolex
+                        </dt>
+                        <dd>
+                            劳力士创始人为汉斯.威尔斯多夫，1908年他在瑞士将劳力士注册为商标。
+                        </dd>
+                        <dt>
+                        Vacheron Constantin
+                        </dt>
+                        <dd>
+                            始创于1775年的江诗丹顿已有250年历史，
+                        </dd>
+                        <dd>
+                            是世界上历史最悠久、延续时间最长的名表之一。
+                        </dd>
+                        <dt>
+                        IWC
+                        </dt>
+                        <dd>
+                            创立于1868年的万国表有“机械表专家”之称。
+                        </dd>
+                        <dt>
+                        Cartier
+                        </dt>
+                        <dd>
+                            卡地亚拥有150多年历史，是法国珠宝金银首饰的制造名家。
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
