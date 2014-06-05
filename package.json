@@ -6,7 +6,14 @@
     "start": "node app.js"
   },
   "dependencies": {
-    "express": "3.10.2",
-    "ejs": "*"
+    "express": "3.8.0",
+    "ejs": "*",
+	"mongodb": "*",
+	"connect-mongo": "*",
+	"connect-flash": "*"
+  },
+    "engines": {
+    "node": "0.10.13",
+    "npm": "1.3.2"
   }
 }
