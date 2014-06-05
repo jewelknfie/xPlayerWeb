@@ -1,0 +1,32 @@
+<%- include header %>
+
+<div class="span10">
+	
+	<form class="form-horizontal" action='/post' method="post" enctype="multipart/form-data">
+		<div class="control-group">
+			<label class="control-label" for="title">标题：</label>
+			<div class="controls">
+				<input id="title" name="title" type="text" />
+			</div>
+		</div>
+		<div class="control-group">
+			<label class="control-label" for="title">视频文件：</label>
+			<div class="controls">
+				<input type="file" name='videofile'/><br>
+			</div>
+		</div>
+		
+		<div class="control-group">
+			<label class="control-label" for="post">描述：</label>
+			<div class="controls">
+				<textarea id="post" style="width: 600px" name="post" rows="20" cols="100"></textarea>
+			</div>
+		</div>
+		<div class="control-group">
+			<div class="controls">
+				<button type="submit" class="btn">发表</button>
+			</div>
+		</div>
+	</form>
+</div>
+<%- include footer %>
