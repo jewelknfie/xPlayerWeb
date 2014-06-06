@@ -1,12 +1,13 @@
 var mongodb = require('./db');
 
-function Post(name, title, videoName, post) {
+function Post(name, title, productor, classification, videoName, post) {
 	this.name = name;
 	this.title = title;
+	this.productor = productor;
+	this.classification = classification;
 	this.videoName = videoName;
 	this.post = post;
-}
-;
+};
 
 module.exports = Post;
 
@@ -28,6 +29,8 @@ Post.prototype.save = function(callback) {
 		name: this.name,
 		time: time,
 		title: this.title,
+		productor: this.productor,
+		classification : this.classification,
 		videoName: this.videoName,
 		post: this.post,
 		comments: []
@@ -56,7 +59,7 @@ Post.prototype.save = function(callback) {
 	});
 };
 
-Post.getAll = function(name, callback) {
+Post.getAll = function(name, productor, classification, day, title, callback) {
 	//打开数据库
 	mongodb.open(function(err, db) {
 		if (err) {
@@ -72,6 +75,18 @@ Post.getAll = function(name, callback) {
 			if (name) {
 				query.name = name;
 			}
+			if (productor) {
+				query.productor = productor;
+			}
+			if (classification) {
+				query.classification = classification;
+			}
+			if (day) {
+				query.day = day;
+			}
+			if (title) {
+				query.title = title;
+			}
 			//根据 query 对象查询文章
 			collection.find(query).sort({
 				time: -1
@@ -81,6 +96,36 @@ Post.getAll = function(name, callback) {
 					return callback(err);//失败！返回 err
 				}
 				callback(null, docs);//成功！以数组形式返回查询的结果
+			});
+		});
+	});
+};
+
+Post.getOne = function(name, productor, classification, day, title, callback) {
+	//打开数据库
+	mongodb.open(function(err, db) {
+		if (err) {
+			return callback(err);
+		}
+		//读取 posts 集合
+		db.collection('posts', function(err, collection) {
+			if (err) {
+				mongodb.close();
+				return callback(err);
+			}
+			//根据 query 对象查询文章
+			collection.findOne({
+				"name" : name, 
+				"productor" : productor, 
+				"classification" : classification, 
+				"time.day": day,
+				"title": title
+			}, function(err, doc) {
+				mongodb.close();
+				if (err) {
+					return callback(err);//失败！返回 err
+				}
+				callback(null, doc);
 			});
 		});
 	});

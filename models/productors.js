@@ -1,7 +1,18 @@
+var fs = require('fs');
+
 function Productors() {
-    this.productorList=['p1', 'p2', 'p3'];
-    this.classificationList=['产品介绍', '产品流程', 'Q&A'];
-}
+};
 
 module.exports = Productors;
+
+Productors.productorList=function() {
+	return ['产品A', '明星产品B', '明星产品C'];
+}
+Productors.classificationList=function() {
+	return ['产品介绍', '产品流程', 'Q&A'];
+}
+
+Productors.videoList=function(callback) {
+	return fs.readdirSync('./public/resources');
+}
 

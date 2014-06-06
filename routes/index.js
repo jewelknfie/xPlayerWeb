@@ -2,34 +2,127 @@ var crypto = require('crypto')
 		, User = require('../models/user.js')
 		, Post = require('../models/post.js')
 		, fs = require('fs')
-//        , productors = require('../models/productors.js')
+		, productors = require('../models/productors.js')
 		, Comment = require('../models/comment.js');
 /*
  * GET home page.
  */
 
 module.exports = function(app) {
-	
+
 	app.get('/', function(req, res) {
-		Post.getAll(null, function(err, posts) {
+		res.redirect("/p/0");
+	});
+
+	app.get('/p/:productor', function(req, res) {
+		Post.getAll(null, req.params.productor, null, null, null, function(err, posts) {
 			if (err) {
 				posts = [];
 			}
-			res.render('index', {
-				title: 'Welcome to use xPlayerWeb',
+			res.render('detailshow', {
+				title: 'show',
 				user: req.session.user,
 				posts: posts,
+				curProductor: req.params.productor,
+				curClassification: req.params.classification,
+				productorList: productors.productorList(),
+				classificationList: productors.classificationList(),
+				success: req.flash('success').toString(),
+				error: req.flash('error').toString()
+			});
+		});
+	});
+
+	app.get('/p/:productor/:classification', function(req, res) {
+		Post.getAll(null, req.params.productor, req.params.classification, null, null, function(err, posts) {
+			if (err) {
+				posts = [];
+			}
+			res.render('detailshow', {
+				title: 'show',
+				user: req.session.user,
+				posts: posts,
+				curProductor: req.params.productor,
+				curClassification: req.params.classification,
+				productorList: productors.productorList(),
+				classificationList: productors.classificationList(),
+				success: req.flash('success').toString(),
+				error: req.flash('error').toString()
+			});
+		});
+	});
+
+	app.get('/p/:productor/:classification/:username', function(req, res) {
+		Post.getAll(req.params.username, req.params.productor, req.params.classification, null, null, function(err, posts) {
+			if (err) {
+				posts = [];
+			}
+			res.render('detailshow', {
+				title: 'show',
+				user: req.session.user,
+				posts: posts,
+				curProductor: req.params.productor,
+				curClassification: req.params.classification,
+				productorList: productors.productorList(),
+				classificationList: productors.classificationList(),
+				success: req.flash('success').toString(),
+				error: req.flash('error').toString()
+			});
+		});
+	});
+
+	app.get('/p/:productor/:classification/:username/:day/:title', function(req, res) {
+		Post.getOne(req.params.username, req.params.productor, req.params.classification, req.params.day, req.params.title, function(err, post) {
+			if (err) {
+				req.flash('error', err);
+				return res.redirect("/");
+			}
+			if (!post) {
+				req.flash('error', "The article not found!");
+				return res.redirect("/");
+			}
+			res.render('article', {
+				title: req.params.title,
+				post: post,
+				user: req.session.user,
+				curProductor: req.params.productor,
+				curClassification: req.params.classification,
+				productorList: productors.productorList(),
+				classificationList: productors.classificationList(),
 				success: req.flash('success').toString(),
 				error: req.flash('error').toString()
 			});
 		});
 	});
 	
+	app.post('/s', function(req, res) {
+		Post.getAll(null, null, null, null, req.body.searchTitle, function(err, posts) {
+			if (err) {
+				posts = [];
+			}
+			res.render('detailshow', {
+				title: 'show',
+				user: req.session.user,
+				posts: posts,
+				curProductor: req.params.productor,
+				curClassification: req.params.classification,
+				productorList: productors.productorList(),
+				classificationList: productors.classificationList(),
+				success: req.flash('success').toString(),
+				error: req.flash('error').toString()
+			});
+		});
+	});
+
 	app.get('/login', checkNotLogin);
 	app.get('/login', function(req, res) {
 		res.render('login', {
 			title: '登陆',
 			user: req.session.user,
+			curProductor: req.params.productor,
+			curClassification: req.params.classification,
+			productorList: productors.productorList(),
+			classificationList: productors.classificationList(),
 			success: req.flash('success').toString(),
 			error: req.flash('error').toString()
 		});
@@ -57,7 +150,7 @@ module.exports = function(app) {
 			res.redirect('/');//登陆成功后跳转到主页
 		});
 	});
-	
+
 	app.get('/reg', checkNotLogin);
 	app.get('/reg', function(req, res) {
 		res.render('reg', {
@@ -104,26 +197,28 @@ module.exports = function(app) {
 			});
 		});
 	});
-	
+
 	app.get('/post', checkLogin);
 	app.get('/post', function(req, res) {
+		console.log(productors.videoList());
 		res.render('post', {
 			title: '发表',
-            productorList:['p1', 'p2', 'p3'],
+			curProductor: req.params.productor,
+			curClassification: req.params.classification,
+			productorList: productors.productorList(),
+			classificationList: productors.classificationList(),
+			videoList: productors.videoList(),
 			user: req.session.user,
 			success: req.flash('success').toString(),
 			error: req.flash('error').toString()
 		});
 	});
-	
+
 	app.post('/post', checkLogin);
 	app.post('/post', function(req, res) {
+		console.log(req.session.user.name);
 		var currentUser = req.session.user,
-				post = new Post(currentUser.name, req.body.title, req.files.videofile.name, req.body.post),
-				target_path = './public/videos/' + req.files.videofile.name;
-		// 使用同步方式重命名一个文件
-		fs.renameSync(req.files.videofile.path, target_path);
-		console.log('Successfully renamed a file!');
+				post = new Post(currentUser.name, req.body.title, req.body.productor, req.body.classification, req.body.videoName, req.body.post);
 		post.save(function(err) {
 			if (err) {
 				req.flash('error', err);
@@ -133,7 +228,39 @@ module.exports = function(app) {
 			res.redirect('/');//发表成功跳转到主页
 		});
 	});
-	
+
+	app.get('/upload', checkLogin);
+	app.get('/upload', function(req, res) {
+		res.render('upload', {
+			title: '上传文件',
+			user: req.session.user,
+			curProductor: req.params.productor,
+			curClassification: req.params.classification,
+			productorList: productors.productorList(),
+			classificationList: productors.classificationList(),
+			success: req.flash('success').toString(),
+			error: req.flash('error').toString()
+		});
+	});
+
+	app.post('/upload', checkLogin);
+	app.post('/upload', function(req, res) {
+		for (var i in req.files) {
+			if (req.files[i].size == 0) {
+				// 使用同步方式删除一个文件
+				fs.unlinkSync(req.files[i].path);
+				console.log('Successfully removed an empty file!');
+			} else {
+				var target_path = './public/resources/' + req.files[i].name;
+				// 使用同步方式重命名一个文件
+				fs.renameSync(req.files[i].path, target_path);
+				console.log('Successfully renamed a file!');
+			}
+		}
+		req.flash('success', '上传成功!');
+		res.redirect('/upload');//发表成功跳转到主页
+	});
+
 	app.get('/logout', checkLogin);
 	app.get('/logout', function(req, res) {
 		req.session.user = null;
@@ -156,5 +283,5 @@ module.exports = function(app) {
 		}
 		next();
 	}
-	
+
 }

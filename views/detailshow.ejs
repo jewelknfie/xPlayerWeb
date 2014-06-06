@@ -1,0 +1,39 @@
+<%- include header %>	
+<div class="row-fluid">
+	<div class="span3">
+		<ul class="nav nav-list">
+			<li class="nav-header">
+			</li>
+			<% classificationList.forEach(function (classification, index) { %>
+			<li <% if(curClassification == index) { %> class="active" <% } %> >
+				<a href="/p/<%= curProductor %>/<%= index %>/"><%= classification %></a>
+			</li>
+			<% }) %>
+		</ul>
+	</div>
+	<div class="span9">
+
+		<% posts.forEach(function (post, index) { %>
+		<blockquote>
+			<p>
+				<a href="/p/<%= post.productor %>/<%= post.classification %>/<%= post.name %>/<%= post.time.day %>/<%= post.title %>"><%= post.title %></a>
+			</p> 
+			<small>作者：<a href="/p/<%= post.productor %>/<%= post.classification %>/<%= post.name %>"><%= post.name %></a> | 
+				日期：<%= post.time.minute %></small>
+		</blockquote>
+		<% }) %>
+
+<!--		<div class="pagination pagination-right">
+			<ul>
+				<li>
+					<a href="#">上一页</a>
+				</li>
+				<li>
+					<a href="#">下一页</a>
+				</li>
+			</ul>
+		</div>-->
+	</div>
+</div>
+</div>
+<%- include footer %>
