@@ -2,6 +2,7 @@ var crypto = require('crypto')
 		, User = require('../models/user.js')
 		, Post = require('../models/post.js')
 		, fs = require('fs')
+//        , productors = require('../models/productors.js')
 		, Comment = require('../models/comment.js');
 /*
  * GET home page.
@@ -108,6 +109,7 @@ module.exports = function(app) {
 	app.get('/post', function(req, res) {
 		res.render('post', {
 			title: '发表',
+            productorList:['p1', 'p2', 'p3'],
 			user: req.session.user,
 			success: req.flash('success').toString(),
 			error: req.flash('error').toString()
