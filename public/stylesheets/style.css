@@ -6,3 +6,50 @@ body {
 a {
   color: #00B7FF;
 }
+
+.m-top3 {
+    margin-top: 30px;
+}
+
+.j-nav-side {
+    padding: 0;
+    background-color: #fff;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    -webkit-box-shadow: 0 1px 4px rgba(0,0,0,.065);
+    -moz-box-shadow: 0 1px 4px rgba(0,0,0,.065);
+    box-shadow: 0 1px 4px rgba(0,0,0,.065);
+    max-width: 220px;
+}
+
+.j-nav-side li a {
+    display: block;
+    margin: 0 0 -1px;
+    padding: 8px 14px;
+    /*max-width: 200px;*/
+    border: 1px solid #E5E5E5;
+}
+
+.j-content-side {
+    padding: 0;
+    background-color: #fff;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    border-radius: 6px;
+    -webkit-box-shadow: 0 1px 4px rgba(0,0,0,.065);
+    -moz-box-shadow: 0 1px 4px rgba(0,0,0,.065);
+    box-shadow: 0 1px 4px rgba(0,0,0,.065);
+    border-left: 1px solid #EEE;
+    /*background-color: whiteSmoke;*/
+}
+
+.j-search-result {
+    padding-left: 45px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    /*margin: 0 0 10px;*/
+    list-style: none;
+    border-bottom: 1px solid #EEE;
+    /*border-left: 1px solid #EEE;*/
+}

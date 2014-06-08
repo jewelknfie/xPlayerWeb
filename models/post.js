@@ -101,6 +101,58 @@ Post.getAll = function(name, productor, classification, day, title, callback) {
 	});
 };
 
+Post.getTen = function(name, productor, classification, day, title, page, callback) {
+    //打开数据库
+    mongodb.open(function (err, db) {
+        if (err) {
+            return callback(err);
+        }
+        //读取 posts 集合
+        db.collection('posts', function (err, collection) {
+            if (err) {
+                mongodb.close();
+                return callback(err);
+            }
+            var query = {};
+            if (name) {
+                query.name = name;
+            }
+            if (productor) {
+                query.productor = productor;
+            }
+            if (classification) {
+                query.classification = classification;
+            }
+            if (day) {
+                query.day = day;
+            }
+            if (title) {
+                query.title = title;
+            }
+            //使用 count 返回特定查询的文档数 total
+            collection.count(query, function (err, total) {
+                //根据 query 对象查询，并跳过前 (page-1)*10 个结果，返回之后的 10 个结果
+                collection.find(query, {
+                    skip: (page - 1)*10,
+                    limit: 10
+                }).sort({
+                    time: -1
+                }).toArray(function (err, docs) {
+                    mongodb.close();
+                    if (err) {
+                        return callback(err);
+                    }
+//                    //解析 markdown 为 html
+//                    docs.forEach(function (doc) {
+//                        doc.post = markdown.toHTML(doc.post);
+//                    });
+                    callback(null, docs, total);
+                });
+            });
+        });
+    });
+};
+
 Post.getOne = function(name, productor, classification, day, title, callback) {
 	//打开数据库
 	mongodb.open(function(err, db) {
@@ -129,4 +181,103 @@ Post.getOne = function(name, productor, classification, day, title, callback) {
 			});
 		});
 	});
+};
+
+Post.search = function(keyword, callback) {
+    mongodb.open(function (err, db) {
+        if (err) {
+            return callback(err);
+        }
+        db.collection('posts', function (err, collection) {
+            if (err) {
+                mongodb.close();
+                return callback(err);
+            }
+            var pattern = new RegExp("^.*" + keyword + ".*$", "i");
+            collection.find({
+                "title": pattern
+            }, {
+                "productor":1,
+                "classification":1,
+                "name": 1,
+                "time": 1,
+                "title": 1
+            }).sort({
+                time: -1
+            }).toArray(function (err, docs) {
+                mongodb.close();
+                if (err) {
+                    return callback(err);
+                }
+                callback(null, docs);
+            });
+        });
+    });
+};
+
+//更新一篇文章及其相关信息
+Post.update = function(name, productor, classification, day, title, videoName, post, callback) {
+    //打开数据库
+    mongodb.open(function (err, db) {
+        if (err) {
+            return callback(err);
+        }
+        //读取 posts 集合
+        db.collection('posts', function (err, collection) {
+            if (err) {
+                mongodb.close();
+                return callback(err);
+            }
+            //更新文章内容
+            collection.update({
+                "name": name,
+                "time.day": day,
+                "title": title,
+                "productor": productor,
+                "classification": classification
+            }, {
+                $set: {post: post, videoName: videoName}
+            }, function (err) {
+                mongodb.close();
+                if (err) {
+                    return callback(err);
+                }
+                callback(null);
+            });
+        });
+    });
+};
+
+//删除一篇文章
+Post.remove = function(name, productor, classification, day, title, callback) {
+    //打开数据库
+    mongodb.open(function (err, db) {
+        if (err) {
+            return callback(err);
+        }
+        //读取 posts 集合
+        db.collection('posts', function (err, collection) {
+            if (err) {
+                mongodb.close();
+                return callback(err);
+            }
+            //删除文档
+            collection.remove({
+                "name": name,
+                "time.day": day,
+                "title": title,
+                "productor": productor,
+                "classification": classification
+            }, {
+                w:1
+            } ,function (err) {
+                if (err) {
+                    mongodb.close();
+                    return callback(err);
+                }
+                mongodb.close();
+                callback(null);
+            });
+        });
+    });
 };

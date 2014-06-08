@@ -1,10 +1,12 @@
 var mongodb = require('./db');
 
-function Comment(name, day, title, comment) {
-	this.name = name;
-	this.day = day;
-	this.title = title;
-	this.comment = comment;
+function Comment(name, day, title, productor, classification, comment) {
+    this.name = name;
+    this.day = day;
+    this.title = title;
+    this.productor = productor;
+    this.classification = classification;
+    this.comment = comment;
 }
 
 module.exports = Comment;
@@ -14,6 +16,8 @@ Comment.prototype.save = function(callback) {
 	var name = this.name,
 			day = this.day,
 			title = this.title,
+            productor= this.productor,
+            classification = this.classification,
 			comment = this.comment;
 	//打开数据库
 	mongodb.open(function(err, db) {
@@ -30,7 +34,9 @@ Comment.prototype.save = function(callback) {
 			collection.update({
 				"name": name,
 				"time.day": day,
-				"title": title
+				"title": title,
+                "productor":productor,
+                "classification" : classification
 			}, {
 				$push: {"comments": comment}
 			}, function(err) {

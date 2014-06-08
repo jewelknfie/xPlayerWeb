@@ -1,39 +1,53 @@
-<%- include header %>	
-<div class="row-fluid">
-	<div class="span3">
-		<ul class="nav nav-list">
-			<li class="nav-header">
-			</li>
+<%- include header %>
+	<div class="span3 ">
+        <% if (curProductor) { %>
+		<ul class="nav nav-list j-nav-side">
+
 			<% classificationList.forEach(function (classification, index) { %>
 			<li <% if(curClassification == index) { %> class="active" <% } %> >
-				<a href="/p/<%= curProductor %>/<%= index %>/"><%= classification %></a>
+				 <a href="/p/<%= curProductor %>/<%= index %>/"><i class="icon-chevron-right"></i> <%= classification %></a>
 			</li>
 			<% }) %>
 		</ul>
+        <% } %>
 	</div>
-	<div class="span9">
+	<div class="span9 ">
+
+        <% if (posts.length == 0) { %>
+        <div class="text-center">
+            <img src="/img/noResult.jpg" />
+            <p class="text-error">为什么不给我结果！</p>
+        </div>
+
+        <% } %>
 
 		<% posts.forEach(function (post, index) { %>
-		<blockquote>
+		<!--<blockquote>-->
+        <div class="j-search-result">
 			<p>
-				<a href="/p/<%= post.productor %>/<%= post.classification %>/<%= post.name %>/<%= post.time.day %>/<%= post.title %>"><%= post.title %></a>
+                <i class="icon-briefcase"></i>  <a href="/p/<%= post.productor %>/<%= post.classification %>/<%= post.name %>/<%= post.time.day %>/<%= post.title %>"><%= post.title %></a>
 			</p> 
 			<small>作者：<a href="/p/<%= post.productor %>/<%= post.classification %>/<%= post.name %>"><%= post.name %></a> | 
 				日期：<%= post.time.minute %></small>
-		</blockquote>
-		<% }) %>
+		<!--</blockquote>-->
+		</div>
+            <% }) %>
 
-<!--		<div class="pagination pagination-right">
+		<div class="pagination pagination-right">
 			<ul>
+                <% if(!isFirstPage) { %>
 				<li>
-					<a href="#">上一页</a>
+					<a href="?p=<%= page-1 %>">上一页</a>
 				</li>
+                <% } %>
+                <% if(!isLastPage) { %>
 				<li>
-					<a href="#">下一页</a>
+					<a href="?p=<%= page+1 %>">下一页</a>
 				</li>
+                <% } %>
 			</ul>
-		</div>-->
+		</div>
+
 	</div>
-</div>
-</div>
+
 <%- include footer %>

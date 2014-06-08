@@ -3,25 +3,30 @@
     <head>
         <title><%= title %></title>
 		<meta charset="utf-8">
-        <link href="/stylesheets/bootstrap-responsive.min.css" rel="stylesheet">
         <link href="/stylesheets/bootstrap.min.css" rel="stylesheet">
+        <link href="/stylesheets/bootstrap-responsive.min.css" rel="stylesheet">
 		<link rel='stylesheet' href='/stylesheets/style.css' />
         <script type="text/javascript" src="/js/jquery-2.0.0.min.js"></script>
         <script type="text/javascript" src="/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="/js/fuc.js"></script>
+
+        <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+        <link href="http://netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
+        <link href="/stylesheets/index.css" rel="stylesheet">
+
     </head>
     <body>
 
         <div class="container-fluid">
             <div class="row-fluid">
-                <div class="span12">
+                <div class="span12 navbar navbar-fixed-top navbar-inner">
                     <ul class="nav nav-pills">
 						<!--                        <li >
 													<a href="#">首页</a>
 												</li>-->
 						<% productorList.forEach(function (productor, index) { %>
 						<li <% if(curProductor == index) { %> class="active" <% } %> >
-							<a href="/p/<%= index %>/"><%= productor %></a>
+							<a href="/p/<%= index %>/"><i class="icon-star"></i> <%= productor %></a>
 						</li>
 						<% }) %>
                         <% if(user) { %>
@@ -41,7 +46,7 @@
 						</li>
 						<% } else { %>
 						<li class="pull-right">
-							<a href="/login">登陆</a>
+							<a  href="/login"><span class="btn-block">登陆</span></a>
                         </li>
 						<% } %>
                         <li class="pull-right">
@@ -52,10 +57,18 @@
                     </ul>
                 </div>
             </div>
-            <article>
+            <!--<header class="jumbotron subhead" id="overview">-->
+                <!--<div class="container">-->
+                    <!--<h1>组件</h1>-->
+                    <!--<p class="lead">无数可复用的组件，包括导航、警告框、弹出框等更多功能。</p>-->
+                <!--</div>-->
+            <!--</header>-->
+            <article  >
                 <% if (success) { %>
                 <div><%= success %></div>
                 <% } %>
                 <% if (error) { %>
                 <div><%= error %> </div>
                 <% } %>
+                </article>
+            <div class="row-fluid m-top3">
