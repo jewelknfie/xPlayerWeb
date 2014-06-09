@@ -6,10 +6,10 @@ function Productors() {
 module.exports = Productors;
 
 Productors.productorList=function() {
-	return ['产品A', '明星产品B', '明星产品C'];
+	return ['手机软件', 'smart pss'];
 }
 Productors.classificationList=function() {
-	return ['产品介绍', '产品流程', 'Q&A'];
+	return ['产品介绍', '操作指南', 'Q&A 技术交流'];
 }
 
 Productors.videoList=function(callback) {

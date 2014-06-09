@@ -10,7 +10,9 @@
     "ejs": "*",
 	"mongodb": "*",
 	"connect-mongo": "*",
-	"connect-flash": "*"
+	"connect-flash": "*",
+    "raw-body":"*",
+	"markdown":"*"
   },
     "engines": {
     "node": "0.10.13",

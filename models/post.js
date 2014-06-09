@@ -1,4 +1,5 @@
-var mongodb = require('./db');
+var mongodb = require('./db'),
+    markdown = require('markdown').markdown;
 
 function Post(name, title, productor, classification, videoName, post) {
 	this.name = name;
@@ -59,47 +60,47 @@ Post.prototype.save = function(callback) {
 	});
 };
 
-Post.getAll = function(name, productor, classification, day, title, callback) {
-	//打开数据库
-	mongodb.open(function(err, db) {
-		if (err) {
-			return callback(err);
-		}
-		//读取 posts 集合
-		db.collection('posts', function(err, collection) {
-			if (err) {
-				mongodb.close();
-				return callback(err);
-			}
-			var query = {};
-			if (name) {
-				query.name = name;
-			}
-			if (productor) {
-				query.productor = productor;
-			}
-			if (classification) {
-				query.classification = classification;
-			}
-			if (day) {
-				query.day = day;
-			}
-			if (title) {
-				query.title = title;
-			}
-			//根据 query 对象查询文章
-			collection.find(query).sort({
-				time: -1
-			}).toArray(function(err, docs) {
-				mongodb.close();
-				if (err) {
-					return callback(err);//失败！返回 err
-				}
-				callback(null, docs);//成功！以数组形式返回查询的结果
-			});
-		});
-	});
-};
+//Post.getAll = function(name, productor, classification, day, title, callback) {
+//	//打开数据库
+//	mongodb.open(function(err, db) {
+//		if (err) {
+//			return callback(err);
+//		}
+//		//读取 posts 集合
+//		db.collection('posts', function(err, collection) {
+//			if (err) {
+//				mongodb.close();
+//				return callback(err);
+//			}
+//			var query = {};
+//			if (name) {
+//				query.name = name;
+//			}
+//			if (productor) {
+//				query.productor = productor;
+//			}
+//			if (classification) {
+//				query.classification = classification;
+//			}
+//			if (day) {
+//				query.day = day;
+//			}
+//			if (title) {
+//				query.title = title;
+//			}
+//			//根据 query 对象查询文章
+//			collection.find(query).sort({
+//				time: -1
+//			}).toArray(function(err, docs) {
+//				mongodb.close();
+//				if (err) {
+//					return callback(err);//失败！返回 err
+//				}
+//				callback(null, docs);//成功！以数组形式返回查询的结果
+//			});
+//		});
+//	});
+//};
 
 Post.getTen = function(name, productor, classification, day, title, page, callback) {
     //打开数据库
@@ -142,10 +143,9 @@ Post.getTen = function(name, productor, classification, day, title, page, callba
                     if (err) {
                         return callback(err);
                     }
-//                    //解析 markdown 为 html
-//                    docs.forEach(function (doc) {
-//                        doc.post = markdown.toHTML(doc.post);
-//                    });
+                    docs.forEach(function (doc) {
+                        doc.post = markdown.toHTML(doc.post);
+                    });
                     callback(null, docs, total);
                 });
             });
@@ -153,7 +153,7 @@ Post.getTen = function(name, productor, classification, day, title, page, callba
     });
 };
 
-Post.getOne = function(name, productor, classification, day, title, callback) {
+Post.getOne = function(name, productor, classification, day, title, needMarkdown, callback) {
 	//打开数据库
 	mongodb.open(function(err, db) {
 		if (err) {
@@ -176,6 +176,9 @@ Post.getOne = function(name, productor, classification, day, title, callback) {
 				mongodb.close();
 				if (err) {
 					return callback(err);//失败！返回 err
+				}
+				if (doc && needMarkdown) {
+					doc.post = markdown.toHTML(doc.post);
 				}
 				callback(null, doc);
 			});
@@ -209,6 +212,9 @@ Post.search = function(keyword, callback) {
                 if (err) {
                     return callback(err);
                 }
+				docs.forEach(function (doc) {
+                        doc.post = markdown.toHTML(doc.post);
+                    });
                 callback(null, docs);
             });
         });
