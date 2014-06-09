@@ -1,5 +1,6 @@
-var mongodb = require('./db'),
-    markdown = require('markdown').markdown;
+var mongodb = require('./db')
+  , markdown = require('markdown').markdown
+  , ObjectID = require('mongodb').ObjectID;
 
 function Post(name, title, productor, classification, videoName, post) {
 	this.name = name;
@@ -12,11 +13,11 @@ function Post(name, title, productor, classification, videoName, post) {
 
 module.exports = Post;
 
-//存储用户信息
-Post.prototype.save = function(callback) {
+function getTime() {
+	
 	var date = new Date();
 	//存储各种时间格式，方便以后扩展
-	var time = {
+	return {
 		date: date,
 		year: date.getFullYear(),
 		month: date.getFullYear() + "-" + (date.getMonth() + 1),
@@ -24,11 +25,17 @@ Post.prototype.save = function(callback) {
 		minute: date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " +
 				date.getHours() + ":" + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes())
 	};
+	
+}
 
+//存储用户信息
+Post.prototype.save = function(callback) {
+	
 	//要存入数据库的用户文档
 	var post = {
 		name: this.name,
-		time: time,
+		time: getTime(),
+		updated_time: getTime(),
 		title: this.title,
 		productor: this.productor,
 		classification : this.classification,
@@ -60,49 +67,7 @@ Post.prototype.save = function(callback) {
 	});
 };
 
-//Post.getAll = function(name, productor, classification, day, title, callback) {
-//	//打开数据库
-//	mongodb.open(function(err, db) {
-//		if (err) {
-//			return callback(err);
-//		}
-//		//读取 posts 集合
-//		db.collection('posts', function(err, collection) {
-//			if (err) {
-//				mongodb.close();
-//				return callback(err);
-//			}
-//			var query = {};
-//			if (name) {
-//				query.name = name;
-//			}
-//			if (productor) {
-//				query.productor = productor;
-//			}
-//			if (classification) {
-//				query.classification = classification;
-//			}
-//			if (day) {
-//				query.day = day;
-//			}
-//			if (title) {
-//				query.title = title;
-//			}
-//			//根据 query 对象查询文章
-//			collection.find(query).sort({
-//				time: -1
-//			}).toArray(function(err, docs) {
-//				mongodb.close();
-//				if (err) {
-//					return callback(err);//失败！返回 err
-//				}
-//				callback(null, docs);//成功！以数组形式返回查询的结果
-//			});
-//		});
-//	});
-//};
-
-Post.getTen = function(name, productor, classification, day, title, page, callback) {
+Post.getTen = function(name, productor, classification, day, title, searchType, page, callback) {
     //打开数据库
     mongodb.open(function (err, db) {
         if (err) {
@@ -116,7 +81,11 @@ Post.getTen = function(name, productor, classification, day, title, page, callba
             }
             var query = {};
             if (name) {
-                query.name = name;
+                if (searchType == 'name') {
+					query.name = new RegExp("^.*" + name + ".*$", "i");
+				}
+				query.name = name;
+				
             }
             if (productor) {
                 query.productor = productor;
@@ -128,6 +97,9 @@ Post.getTen = function(name, productor, classification, day, title, page, callba
                 query.day = day;
             }
             if (title) {
+                if (searchType == 'title') {
+					query.title = new RegExp("^.*" + title + ".*$", "i");
+				}
                 query.title = title;
             }
             //使用 count 返回特定查询的文档数 total
@@ -153,7 +125,7 @@ Post.getTen = function(name, productor, classification, day, title, page, callba
     });
 };
 
-Post.getOne = function(name, productor, classification, day, title, needMarkdown, callback) {
+Post.getOne = function(name, keyId, needMarkdown, callback) {
 	//打开数据库
 	mongodb.open(function(err, db) {
 		if (err) {
@@ -165,14 +137,13 @@ Post.getOne = function(name, productor, classification, day, title, needMarkdown
 				mongodb.close();
 				return callback(err);
 			}
-			//根据 query 对象查询文章
-			collection.findOne({
-				"name" : name, 
-				"productor" : productor, 
-				"classification" : classification, 
-				"time.day": day,
-				"title": title
-			}, function(err, doc) {
+			var query = {};
+            if (name) {
+                query.name = name;
+            }
+			query._id = new ObjectID(keyId);
+			console.log(query);
+			collection.findOne(query, function(err, doc) {
 				mongodb.close();
 				if (err) {
 					return callback(err);//失败！返回 err
@@ -186,43 +157,43 @@ Post.getOne = function(name, productor, classification, day, title, needMarkdown
 	});
 };
 
-Post.search = function(keyword, callback) {
-    mongodb.open(function (err, db) {
-        if (err) {
-            return callback(err);
-        }
-        db.collection('posts', function (err, collection) {
-            if (err) {
-                mongodb.close();
-                return callback(err);
-            }
-            var pattern = new RegExp("^.*" + keyword + ".*$", "i");
-            collection.find({
-                "title": pattern
-            }, {
-                "productor":1,
-                "classification":1,
-                "name": 1,
-                "time": 1,
-                "title": 1
-            }).sort({
-                time: -1
-            }).toArray(function (err, docs) {
-                mongodb.close();
-                if (err) {
-                    return callback(err);
-                }
-				docs.forEach(function (doc) {
-                        doc.post = markdown.toHTML(doc.post);
-                    });
-                callback(null, docs);
-            });
-        });
-    });
-};
+//Post.search = function(keyword, callback) {
+//    mongodb.open(function (err, db) {
+//        if (err) {
+//            return callback(err);
+//        }
+//        db.collection('posts', function (err, collection) {
+//            if (err) {
+//                mongodb.close();
+//                return callback(err);
+//            }
+//            var pattern = new RegExp("^.*" + keyword + ".*$", "i");
+//            collection.find({
+//                "title": pattern
+//            }, {
+//                "productor":1,
+//                "classification":1,
+//                "name": 1,
+//                "time": 1,
+//                "title": 1
+//            }).sort({
+//                time: -1
+//            }).toArray(function (err, docs) {
+//                mongodb.close();
+//                if (err) {
+//                    return callback(err);
+//                }
+//				docs.forEach(function (doc) {
+//                        doc.post = markdown.toHTML(doc.post);
+//                    });
+//                callback(null, docs);
+//            });
+//        });
+//    });
+//};
 
 //更新一篇文章及其相关信息
-Post.update = function(name, productor, classification, day, title, videoName, post, callback) {
+Post.update = function(keyId, post, callback) {
     //打开数据库
     mongodb.open(function (err, db) {
         if (err) {
@@ -236,13 +207,17 @@ Post.update = function(name, productor, classification, day, title, videoName, p
             }
             //更新文章内容
             collection.update({
-                "name": name,
-                "time.day": day,
-                "title": title,
-                "productor": productor,
-                "classification": classification
+                "name": post.name,
+                "_id": new ObjectID(keyId)
             }, {
-                $set: {post: post, videoName: videoName}
+                $set: {
+					updated_time: getTime(),
+					title: post.title,
+					productor: post.productor,
+					classification : post.classification,
+					videoName: post.videoName,
+					post: post.post
+				}
             }, function (err) {
                 mongodb.close();
                 if (err) {
@@ -255,7 +230,7 @@ Post.update = function(name, productor, classification, day, title, videoName, p
 };
 
 //删除一篇文章
-Post.remove = function(name, productor, classification, day, title, callback) {
+Post.remove = function(name, keyId, callback) {
     //打开数据库
     mongodb.open(function (err, db) {
         if (err) {
@@ -269,11 +244,8 @@ Post.remove = function(name, productor, classification, day, title, callback) {
             }
             //删除文档
             collection.remove({
-                "name": name,
-                "time.day": day,
-                "title": title,
-                "productor": productor,
-                "classification": classification
+                "name": post.name,
+                "_id": new ObjectID(keyId)
             }, {
                 w:1
             } ,function (err) {

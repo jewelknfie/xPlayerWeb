@@ -5,7 +5,7 @@
 
 			<% classificationList.forEach(function (classification, index) { %>
 			<li <% if(curClassification == index) { %> class="active" <% } %> >
-				 <a href="/p/<%= curProductor %>/<%= index %>/"><i class="icon-chevron-right"></i> <%= classification %></a>
+				 <a href="/p?productor=<%= curProductor %>&classification=<%= index %>/"><i class="icon-chevron-right"></i> <%= classification %></a>
 			</li>
 			<% }) %>
 		</ul>
@@ -25,9 +25,9 @@
 		<!--<blockquote>-->
         <div class="j-search-result">
 			<p>
-                <i class="icon-briefcase"></i>  <a href="/p/<%= post.productor %>/<%= post.classification %>/<%= post.name %>/<%= post.time.day %>/<%= post.title %>"><%= post.title %></a>
+                <i class="icon-briefcase"></i>  <a href="/a/<%= post._id %>"><%= post.title %></a>
 			</p> 
-			<small>作者：<a href="/p/<%= post.productor %>/<%= post.classification %>/<%= post.name %>"><%= post.name %></a> | 
+			<small>作者：<a href="/p?name=<%= post.name %>"><%= post.name %></a> | 
 				日期：<%= post.time.minute %></small>
 		<!--</blockquote>-->
 		</div>

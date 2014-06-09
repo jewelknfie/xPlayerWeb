@@ -11,12 +11,12 @@ var crypto = require('crypto')
 module.exports = function(app) {
 
 	app.get('/', function(req, res) {
-		res.redirect("/p/0/0");
+		res.redirect("/p?productor=0&classifiction=0");
 	});
 
-	app.get('/p/:productor', function(req, res) {
-        var page = req.query.p ? parseInt(req.query.p) : 1;
-		Post.getTen(null, req.params.productor, null, null, null, page, function(err, posts, total) {
+	app.get('/p', function(req, res) {
+		var page = req.query.p ? parseInt(req.query.p) : 1;
+		Post.getTen(req.query.name, req.query.productor, req.query.classification, req.query.day, req.query.title, req.query.searchType, page, function(err, posts, total) {
 			if (err) {
 				posts = [];
 			}
@@ -24,9 +24,9 @@ module.exports = function(app) {
 				title: 'show',
 				user: req.session.user,
 				posts: posts,
-                page: page,
-                isFirstPage: (page - 1) == 0,
-                isLastPage: ((page - 1) * 10 + posts.length) == total,
+				page: page,
+				isFirstPage: (page - 1) == 0,
+				isLastPage: ((page - 1) * 10 + posts.length) == total,
 				curProductor: req.params.productor,
 				curClassification: req.params.classification,
 				productorList: productors.productorList(),
@@ -36,10 +36,10 @@ module.exports = function(app) {
 			});
 		});
 	});
-
-	app.get('/p/:productor/:classification', function(req, res) {
+	
+	app.post('/p', function(req, res) {
         var page = req.query.p ? parseInt(req.query.p) : 1;
-		Post.getTen(null, req.params.productor, req.params.classification, null, null,  page, function(err, posts, total) {
+		Post.getTen(req.body.name, req.query.productor, req.query.classification, req.query.day, req.body.title, req.query.searchType, page, function(err, posts, total) {
 			if (err) {
 				posts = [];
 			}
@@ -47,9 +47,9 @@ module.exports = function(app) {
 				title: 'show',
 				user: req.session.user,
 				posts: posts,
-                page: page,
-                isFirstPage: (page - 1) == 0,
-                isLastPage: ((page - 1) * 10 + posts.length) == total,
+				page: page,
+				isFirstPage: (page - 1) == 0,
+				isLastPage: ((page - 1) * 10 + posts.length) == total,
 				curProductor: req.params.productor,
 				curClassification: req.params.classification,
 				productorList: productors.productorList(),
@@ -59,33 +59,94 @@ module.exports = function(app) {
 			});
 		});
 	});
+	
+//	app.get('/p/:productor/:classification', function(req, res) {
+//        var page = req.query.p ? parseInt(req.query.p) : 1;
+//		Post.getTen(null, req.params.productor, req.params.classification, null, null,  page, function(err, posts, total) {
+//			if (err) {
+//				posts = [];
+//			}
+//			res.render('detailshow', {
+//				title: 'show',
+//				user: req.session.user,
+//				posts: posts,
+//                page: page,
+//                isFirstPage: (page - 1) == 0,
+//                isLastPage: ((page - 1) * 10 + posts.length) == total,
+//				curProductor: req.params.productor,
+//				curClassification: req.params.classification,
+//				productorList: productors.productorList(),
+//				classificationList: productors.classificationList(),
+//				success: req.flash('success').toString(),
+//				error: req.flash('error').toString()
+//			});
+//		});
+//	});
+//
+//	app.get('/p/:productor/:classification/:username', function(req, res) {
+//        var page = req.query.p ? parseInt(req.query.p) : 1;
+//		Post.getTen(req.params.username, req.params.productor, req.params.classification, null, null,  page, function(err, posts, total) {
+//			if (err) {
+//				posts = [];
+//			}
+//
+//			res.render('detailshow', {
+//				title: 'show',
+//				user: req.session.user,
+//				posts: posts,
+//                page: page,
+//                isFirstPage: (page - 1) == 0,
+//                isLastPage: ((page - 1) * 10 + posts.length) == total,
+//				curProductor: req.params.productor,
+//				curClassification: req.params.classification,
+//				productorList: productors.productorList(),
+//				classificationList: productors.classificationList(),
+//				success: req.flash('success').toString(),
+//				error: req.flash('error').toString()
+//			});
+//		});
+//	});
 
-	app.get('/p/:productor/:classification/:username', function(req, res) {
-        var page = req.query.p ? parseInt(req.query.p) : 1;
-		Post.getTen(req.params.username, req.params.productor, req.params.classification, null, null,  page, function(err, posts, total) {
-			if (err) {
-				posts = [];
-			}
+    app.get('/edit/:keyId', checkLogin);
+    app.get('/edit/:keyId', function (req, res) {
+        var currentUser = req.session.user;
+        Post.getOne(currentUser.name, req.params.keyId, false, function (err, post) {
+            if (err) {
+                req.flash('error', err);
+                return res.redirect('back');
+            }
+            res.render('edit', {
+                title: '编辑',
+                post: post,
+                curProductor: post.productor,
+                productorList: productors.productorList(),
+                classificationList: productors.classificationList(),
+                videoList: productors.videoList(),
+                user: req.session.user,
+                success: req.flash('success').toString(),
+                error: req.flash('error').toString()
+            });
+        });
+    });
 
-			res.render('detailshow', {
-				title: 'show',
-				user: req.session.user,
-				posts: posts,
-                page: page,
-                isFirstPage: (page - 1) == 0,
-                isLastPage: ((page - 1) * 10 + posts.length) == total,
-				curProductor: req.params.productor,
-				curClassification: req.params.classification,
-				productorList: productors.productorList(),
-				classificationList: productors.classificationList(),
-				success: req.flash('success').toString(),
-				error: req.flash('error').toString()
-			});
-		});
-	});
-
-	app.get('/p/:productor/:classification/:username/:day/:title', function(req, res) {
-		Post.getOne(req.params.username, req.params.productor, req.params.classification, req.params.day, req.params.title, true, function(err, post) {
+    app.post('/edit/:keyId', checkLogin);
+    app.post('/edit/:keyId', function (req, res) {
+        var currentUser = req.session.user
+		  , post = new Post(currentUser.name, req.body.title, req.body.productor, req.body.classification, req.body.videoName, req.body.post);
+        Post.update(req.params.keyId, post, function (err) {
+            if (err) {
+                req.flash('error', err);
+                return res.redirect(url);//出错！返回文章页
+            }
+			var url = '/a/' + req.params.keyId;
+            req.flash('success', '修改成功!');
+            res.redirect(url);//成功！返回文章页
+        });
+    });
+	
+	// 查看文章
+    app.get('/a/:keyId', function (req, res) {
+        Post.getOne(null, req.params.keyId, true, function(err, post) {
 			if (err) {
 				req.flash('error', err);
 				return res.redirect("/");
@@ -98,18 +159,19 @@ module.exports = function(app) {
 				title: req.params.title,
 				post: post,
 				user: req.session.user,
-				curProductor: req.params.productor,
-				curClassification: req.params.classification,
+				curProductor: post.productor,
+				curClassification: post.classification,
 				productorList: productors.productorList(),
 				classificationList: productors.classificationList(),
 				success: req.flash('success').toString(),
 				error: req.flash('error').toString()
 			});
 		});
-	});
-
-    app.post('/p/:productor/:classification/:username/:day/:title', checkLogin);
-    app.post('/p/:productor/:classification/:username/:day/:title', function(req, res) {
+    });
+	
+	// 留言
+	app.post('/a/:keyId', checkLogin);
+    app.post('/a/:keyId', function(req, res) {
         var date = new Date(),
             time = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " +
                 date.getHours() + ":" + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes());
@@ -124,7 +186,7 @@ module.exports = function(app) {
             time: time,
             content: req.body.content
         };
-        var newComment = new Comment(req.params.username, req.params.day, req.params.title,  req.params.productor, req.params.classification, comment);
+        var newComment = new Comment(req.params.keyId, comment);
         newComment.save(function (err) {
             if (err) {
                 req.flash('error', err);
@@ -135,47 +197,10 @@ module.exports = function(app) {
         });
     })
 
-    app.get('/edit/:productor/:classification/:name/:day/:title', checkLogin);
-    app.get('/edit/:productor/:classification/:name/:day/:title', function (req, res) {
+    app.get('/remove/:keyId', checkLogin);
+    app.get('/remove/:keyId', function (req, res) {
         var currentUser = req.session.user;
-        Post.getOne(currentUser.name, req.params.productor, req.params.classification, req.params.day, req.params.title, false, function (err, post) {
-            if (err) {
-                req.flash('error', err);
-                return res.redirect('back');
-            }
-            res.render('edit', {
-                title: '编辑',
-                post: post,
-                curProductor: req.params.productor,
-                curClassification: req.params.classification,
-                productorList: productors.productorList(),
-                classificationList: productors.classificationList(),
-                videoList: productors.videoList(),
-                user: req.session.user,
-                success: req.flash('success').toString(),
-                error: req.flash('error').toString()
-            });
-        });
-    });
-
-    app.post('/edit/:productor/:classification/:name/:day/:title', checkLogin);
-    app.post('/edit/:productor/:classification/:name/:day/:title', function (req, res) {
-        var currentUser = req.session.user;
-        Post.update(currentUser.name, req.params.productor, req.params.classification, req.params.day, req.params.title, req.body.videoName, req.body.post, function (err) {
-            var url = '/p/' + req.params.productor + '/' + req.params.classification + '/' + req.params.name + '/' + req.params.day + '/' + req.params.title;
-            if (err) {
-                req.flash('error', err);
-                return res.redirect(url);//出错！返回文章页
-            }
-            req.flash('success', '修改成功!');
-            res.redirect(url);//成功！返回文章页
-        });
-    });
-
-    app.get('/remove/:productor/:classification/:name/:day/:title', checkLogin);
-    app.get('/remove/:productor/:classification/:name/:day/:title', function (req, res) {
-        var currentUser = req.session.user;
-        Post.remove(currentUser.name, req.params.productor, req.params.classification, req.params.day, req.params.title, function (err) {
+        Post.remove(currentUser.name, req.params.keyId, function (err) {
             if (err) {
                 req.flash('error', err);
                 return res.redirect('back');
@@ -185,27 +210,27 @@ module.exports = function(app) {
         });
     });
 
-	app.post('/s', function(req, res) {
-		Post.search( req.body.searchTitle, function(err, posts) {
-			if (err) {
-				posts = [];
-			}
-			res.render('detailshow', {
-				title: 'xPlayerWeb',
-				user: req.session.user,
-				posts: posts,
-                page: 1,
-                isFirstPage: true,
-                isLastPage: true,
-				curProductor: req.params.productor,
-				curClassification: req.params.classification,
-				productorList: productors.productorList(),
-				classificationList: productors.classificationList(),
-				success: req.flash('success').toString(),
-				error: req.flash('error').toString()
-			});
-		});
-	});
+//	app.post('/s', function(req, res) {
+//		Post.search( req.body.searchTitle, function(err, posts) {
+//			if (err) {
+//				posts = [];
+//			}
+//			res.render('detailshow', {
+//				title: 'xPlayerWeb',
+//				user: req.session.user,
+//				posts: posts,
+//                page: 1,
+//                isFirstPage: true,
+//                isLastPage: true,
+//				curProductor: req.params.productor,
+//				curClassification: req.params.classification,
+//				productorList: productors.productorList(),
+//				classificationList: productors.classificationList(),
+//				success: req.flash('success').toString(),
+//				error: req.flash('error').toString()
+//			});
+//		});
+//	});
 
 	app.get('/login', checkNotLogin);
 	app.get('/login', function(req, res) {
@@ -313,7 +338,6 @@ module.exports = function(app) {
 
 	app.post('/post', checkLogin);
 	app.post('/post', function(req, res) {
-		console.log(req.session.user.name);
 		var currentUser = req.session.user,
 				post = new Post(currentUser.name, req.body.title, req.body.productor, req.body.classification, req.body.videoName, req.body.post);
 		post.save(function(err) {
@@ -380,5 +404,7 @@ module.exports = function(app) {
 		}
 		next();
 	}
+	
+	
 
 }

@@ -1,11 +1,8 @@
-var mongodb = require('./db');
+var mongodb = require('./db')
+  , ObjectID = require('mongodb').ObjectID;
 
-function Comment(name, day, title, productor, classification, comment) {
-    this.name = name;
-    this.day = day;
-    this.title = title;
-    this.productor = productor;
-    this.classification = classification;
+function Comment(keyId, comment) {
+    this.keyId = keyId;
     this.comment = comment;
 }
 
@@ -13,12 +10,8 @@ module.exports = Comment;
 
 //存储一条留言信息
 Comment.prototype.save = function(callback) {
-	var name = this.name,
-			day = this.day,
-			title = this.title,
-            productor= this.productor,
-            classification = this.classification,
-			comment = this.comment;
+	var keyId = this.keyId,
+		comment = this.comment;
 	//打开数据库
 	mongodb.open(function(err, db) {
 		if (err) {
@@ -30,13 +23,9 @@ Comment.prototype.save = function(callback) {
 				mongodb.close();
 				return callback(err);
 			}
-			//通过用户名、时间及标题查找文档，并把一条留言对象添加到该文档的 comments 数组里
+			//通过keyid查找文档，并把一条留言对象添加到该文档的 comments 数组里
 			collection.update({
-				"name": name,
-				"time.day": day,
-				"title": title,
-                "productor":productor,
-                "classification" : classification
+                "_id" : new ObjectID(keyId)
 			}, {
 				$push: {"comments": comment}
 			}, function(err) {
