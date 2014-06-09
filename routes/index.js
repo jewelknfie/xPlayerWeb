@@ -11,7 +11,7 @@ var crypto = require('crypto')
 module.exports = function(app) {
 
 	app.get('/', function(req, res) {
-		res.redirect("/p/0");
+		res.redirect("/p/0/0");
 	});
 
 	app.get('/p/:productor', function(req, res) {
