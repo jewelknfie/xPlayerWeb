@@ -43,8 +43,6 @@ module.exports = function(app) {
 			if (err) {
 				posts = [];
 			}
-
-            console.log("acv" + posts.size);
 			res.render('detailshow', {
 				title: 'show',
 				user: req.session.user,
@@ -87,7 +85,7 @@ module.exports = function(app) {
 	});
 
 	app.get('/p/:productor/:classification/:username/:day/:title', function(req, res) {
-		Post.getOne(req.params.username, req.params.productor, req.params.classification, req.params.day, req.params.title, function(err, post) {
+		Post.getOne(req.params.username, req.params.productor, req.params.classification, req.params.day, req.params.title, true, function(err, post) {
 			if (err) {
 				req.flash('error', err);
 				return res.redirect("/");
@@ -140,7 +138,7 @@ module.exports = function(app) {
     app.get('/edit/:productor/:classification/:name/:day/:title', checkLogin);
     app.get('/edit/:productor/:classification/:name/:day/:title', function (req, res) {
         var currentUser = req.session.user;
-        Post.getOne(currentUser.name, req.params.productor, req.params.classification, req.params.day, req.params.title, function (err, post) {
+        Post.getOne(currentUser.name, req.params.productor, req.params.classification, req.params.day, req.params.title, false, function (err, post) {
             if (err) {
                 req.flash('error', err);
                 return res.redirect('back');
