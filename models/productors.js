@@ -6,7 +6,7 @@ function Productors() {
 module.exports = Productors;
 
 Productors.productorList=function() {
-	return ['手机软件', 'smart pss'];
+	return ['手机软件', 'smart pss', '招商引资'];
 }
 Productors.classificationList=function() {
 	return ['产品介绍', '操作指南', 'Q&A 技术交流'];
