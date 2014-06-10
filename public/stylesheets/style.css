@@ -60,3 +60,30 @@ a {
     border-bottom: 1px solid #EEE;
     /*border-left: 1px solid #EEE;*/
 }
+
+.j-comment-content {
+    padding-left: 35px;
+    /*padding-bottom: -5px;*/
+    padding-top: 7px;
+    margin-bottom: 5px;
+    /*margin-top: 5px;*/
+    /*margin: 0 0 10px;*/
+    border-bottom: 1px solid #EEE;
+    /*border-top: 1px solid #EEE;*/
+}
+
+.j-comment {
+    border-top: 2px solid #EEE;
+    margin-top: 50px;
+    padding-top: 0px;
+}
+
+.j-post-content {
+
+}
+
+.j-comment-form {
+    margin-top: 20px;
+    padding-top: 30px;
+    border:  1px solid #EEE;
+}

@@ -11,12 +11,15 @@ var crypto = require('crypto')
 module.exports = function(app) {
 
 	app.get('/', function(req, res) {
-		res.redirect("/p?productor=0&classifiction=0");
+		res.redirect("/p?productor=0&classification=0");
 	});
 
 	app.get('/p', function(req, res) {
+        if (!req.query.name && !req.query.productor && !req.query.classification && !req.query.day && !req.query.title && !req.query.keyword) {
+            return res.redirect("/");
+        }
 		var page = req.query.p ? parseInt(req.query.p) : 1;
-		Post.getTen(req.query.name, req.query.productor, req.query.classification, req.query.day, req.query.title, req.query.searchType, page, function(err, posts, total) {
+		Post.getTen(req.query.name, req.query.productor, req.query.classification, req.query.day, req.query.title, req.query.searchType, req.query.keyword, page, function(err, posts, total) {
 			if (err) {
 				posts = [];
 			}
@@ -25,10 +28,11 @@ module.exports = function(app) {
 				user: req.session.user,
 				posts: posts,
 				page: page,
+                keyword: req.query.keyword ? req.query.keyword : "",
 				isFirstPage: (page - 1) == 0,
 				isLastPage: ((page - 1) * 10 + posts.length) == total,
-				curProductor: req.params.productor,
-				curClassification: req.params.classification,
+				curProductor: req.query.productor,
+				curClassification: req.query.classification,
 				productorList: productors.productorList(),
 				classificationList: productors.classificationList(),
 				success: req.flash('success').toString(),
@@ -37,28 +41,28 @@ module.exports = function(app) {
 		});
 	});
 	
-	app.post('/p', function(req, res) {
-        var page = req.query.p ? parseInt(req.query.p) : 1;
-		Post.getTen(req.body.name, req.query.productor, req.query.classification, req.query.day, req.body.title, req.query.searchType, page, function(err, posts, total) {
-			if (err) {
-				posts = [];
-			}
-			res.render('detailshow', {
-				title: 'show',
-				user: req.session.user,
-				posts: posts,
-				page: page,
-				isFirstPage: (page - 1) == 0,
-				isLastPage: ((page - 1) * 10 + posts.length) == total,
-				curProductor: req.params.productor,
-				curClassification: req.params.classification,
-				productorList: productors.productorList(),
-				classificationList: productors.classificationList(),
-				success: req.flash('success').toString(),
-				error: req.flash('error').toString()
-			});
-		});
-	});
+//	app.post('/p', function(req, res) {
+//        var page = req.query.p ? parseInt(req.query.p) : 1;
+//		Post.getTen(req.body.name, req.query.productor, req.query.classification, req.query.day, req.body.title, req.query.searchType, page, function(err, posts, total) {
+//			if (err) {
+//				posts = [];
+//			}
+//			res.render('detailshow', {
+//				title: 'show',
+//				user: req.session.user,
+//				posts: posts,
+//				page: page,
+//				isFirstPage: (page - 1) == 0,
+//				isLastPage: ((page - 1) * 10 + posts.length) == total,
+//				curProductor: req.params.productor,
+//				curClassification: req.params.classification,
+//				productorList: productors.productorList(),
+//				classificationList: productors.classificationList(),
+//				success: req.flash('success').toString(),
+//				error: req.flash('error').toString()
+//			});
+//		});
+//	});
 	
 //	app.get('/p/:productor/:classification', function(req, res) {
 //        var page = req.query.p ? parseInt(req.query.p) : 1;
@@ -156,7 +160,7 @@ module.exports = function(app) {
 				return res.redirect("/");
 			}
 			res.render('article', {
-				title: req.params.title,
+				title: post.title,
 				post: post,
 				user: req.session.user,
 				curProductor: post.productor,
@@ -170,7 +174,6 @@ module.exports = function(app) {
     });
 	
 	// 留言
-	app.post('/a/:keyId', checkLogin);
     app.post('/a/:keyId', function(req, res) {
         var date = new Date(),
             time = date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " +
@@ -194,6 +197,20 @@ module.exports = function(app) {
             }
             req.flash('success', '留言成功!');
             res.redirect('back');
+        });
+    })
+
+    // 置顶
+    app.get('/sticky/:keyId', function(req, res) {
+        var currentUser = req.session.user;
+        Post.sticky(currentUser.name, req.params.keyId, req.query.s == 'yes',function (err) {
+            if (err) {
+                req.flash('error', err);
+                return res.redirect(url);//出错！返回文章页
+            }
+//            var url = '/a/' + req.params.keyId;
+            req.flash('success', '操作成功!');
+            return res.redirect('back');
         });
     })
 

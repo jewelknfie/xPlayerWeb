@@ -36,6 +36,7 @@ Post.prototype.save = function(callback) {
 		name: this.name,
 		time: getTime(),
 		updated_time: getTime(),
+        sticky_time: null,
 		title: this.title,
 		productor: this.productor,
 		classification : this.classification,
@@ -67,7 +68,7 @@ Post.prototype.save = function(callback) {
 	});
 };
 
-Post.getTen = function(name, productor, classification, day, title, searchType, page, callback) {
+Post.getTen = function(name, productor, classification, day, title, searchType, keyword, page, callback) {
     //打开数据库
     mongodb.open(function (err, db) {
         if (err) {
@@ -81,11 +82,7 @@ Post.getTen = function(name, productor, classification, day, title, searchType, 
             }
             var query = {};
             if (name) {
-                if (searchType == 'name') {
-					query.name = new RegExp("^.*" + name + ".*$", "i");
-				}
-				query.name = name;
-				
+                query.name = name;
             }
             if (productor) {
                 query.productor = productor;
@@ -97,11 +94,18 @@ Post.getTen = function(name, productor, classification, day, title, searchType, 
                 query.day = day;
             }
             if (title) {
-                if (searchType == 'title') {
-					query.title = new RegExp("^.*" + title + ".*$", "i");
-				}
                 query.title = title;
             }
+            if (keyword) {
+                var reg = new RegExp("^.*" + keyword + ".*$", "i");
+                if (searchType == 'title') {
+                    query.title = reg;
+                }
+                if (searchType == 'name') {
+                    query.name = reg;
+                }
+            }
+
             //使用 count 返回特定查询的文档数 total
             collection.count(query, function (err, total) {
                 //根据 query 对象查询，并跳过前 (page-1)*10 个结果，返回之后的 10 个结果
@@ -109,6 +113,7 @@ Post.getTen = function(name, productor, classification, day, title, searchType, 
                     skip: (page - 1)*10,
                     limit: 10
                 }).sort({
+                    sticky_time:-1,
                     time: -1
                 }).toArray(function (err, docs) {
                     mongodb.close();
@@ -149,8 +154,15 @@ Post.getOne = function(name, keyId, needMarkdown, callback) {
 					return callback(err);//失败！返回 err
 				}
 				if (doc && needMarkdown) {
+                    console.log(doc.post);
+                    console.log(markdown.toHTML(doc.post));
+                    console.log(markdown.toHTMLTree(doc.post));
 					doc.post = markdown.toHTML(doc.post);
+                    doc.comments.forEach(function (comment) {
+                        comment.content = markdown.toHTML(comment.content);
+                    });
 				}
+
 				callback(null, doc);
 			});
 		});
@@ -218,6 +230,37 @@ Post.update = function(keyId, post, callback) {
 					videoName: post.videoName,
 					post: post.post
 				}
+            }, function (err) {
+                mongodb.close();
+                if (err) {
+                    return callback(err);
+                }
+                callback(null);
+            });
+        });
+    });
+};
+
+Post.sticky = function(name, keyId, isSticky, callback) {
+    //打开数据库
+    mongodb.open(function (err, db) {
+        if (err) {
+            return callback(err);
+        }
+        //读取 posts 集合
+        db.collection('posts', function (err, collection) {
+            if (err) {
+                mongodb.close();
+                return callback(err);
+            }
+            //更新文章内容
+            collection.update({
+                "name": name,
+                "_id": new ObjectID(keyId)
+            }, {
+                $set: {
+                    sticky_time: isSticky ? getTime() : null
+                }
             }, function (err) {
                 mongodb.close();
                 if (err) {

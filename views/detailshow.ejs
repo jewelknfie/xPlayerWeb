@@ -5,7 +5,7 @@
 
 			<% classificationList.forEach(function (classification, index) { %>
 			<li <% if(curClassification == index) { %> class="active" <% } %> >
-				 <a href="/p?productor=<%= curProductor %>&classification=<%= index %>/"><i class="icon-chevron-right"></i> <%= classification %></a>
+				 <a href="/p?productor=<%= curProductor %>&classification=<%= index %>"><i class="icon-chevron-right"></i> <%= classification %></a>
 			</li>
 			<% }) %>
 		</ul>
@@ -27,27 +27,67 @@
 			<p>
                 <i class="icon-briefcase"></i>  <a href="/a/<%= post._id %>"><%= post.title %></a>
 			</p> 
-			<small>作者：<a href="/p?name=<%= post.name %>"><%= post.name %></a> | 
-				日期：<%= post.time.minute %></small>
+			<small>
+                作者：<a href="/p?name=<%= post.name %>"><%= post.name %></a> |
+				日期：<%= post.time.minute %>
+                <% if (user && user.name == post.name) { %>
+                | <span><a class="edit" href="/edit/<%= post._id %>">编辑</a></span>
+                | <span><a class="edit" href="/remove/<%= post._id %>">删除</a></span>
+
+                <% if (post.sticky_time) { %>
+                | <span><a class="edit" href="/sticky/<%= post._id %>?s=no">取消置顶</a></span>
+                <% } else { %>
+                | <span><a class="edit" href="/sticky/<%= post._id %>?s=yes">置顶</a></span>
+                <% } %>
+
+                <% } %>
+            </small>
 		<!--</blockquote>-->
 		</div>
             <% }) %>
+
 
 		<div class="pagination pagination-right">
 			<ul>
                 <% if(!isFirstPage) { %>
 				<li>
-					<a href="?p=<%= page-1 %>">上一页</a>
+					<a id="page_go_b" href="">上一页</a>
 				</li>
                 <% } %>
                 <% if(!isLastPage) { %>
 				<li>
-					<a href="?p=<%= page+1 %>">下一页</a>
+					<a id="page_go_a" href="">下一页</a>
 				</li>
                 <% } %>
 			</ul>
 		</div>
+        <script type="text/javascript">
+            var page = <%= page %> ;
+            var href = window.location.href;
 
+            if (href.indexOf("?") >= 0) {
+                var p = href.split("?")[1].split("&");
+                var params =[];
+                for (var i = 0,j=0; i < p.length; i++) {
+                    var pair = p[i].split("=");
+                    if (pair[0] != "p") {
+                        params[j++] = pair.join('=');
+                    }
+                }
+                href = href.split("?")[0] + "?" + params.join("&") + (params.length > 0 ? '&p=' : 'p=');
+            }
+            else href = href + "?p=";
+
+            <% if(!isFirstPage) { %>
+            var url = href + (page - 1)
+            $('#page_go_b').attr('href', url);
+            <% } %>
+            <% if(!isLastPage) { %>
+            var url = href + (page + 1)
+            $('#page_go_a').attr('href', url);
+            <% } %>
+
+        </script>
 	</div>
 
 <%- include footer %>

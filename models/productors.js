@@ -13,6 +13,13 @@ Productors.classificationList=function() {
 }
 
 Productors.videoList=function(callback) {
-	return fs.readdirSync('./public/resources');
+	var list = fs.readdirSync('./public/resources');
+    var files = [], i = 0;
+    list.forEach(function (item) {
+        if (item.lastIndexOf('.mp4') == (item.length - 4)) {
+            files[i++] = item;
+        }
+    });
+    return files;
 }
 
