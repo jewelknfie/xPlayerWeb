@@ -27,7 +27,7 @@
 			<p>
                 <i class="icon-briefcase"></i>  <a href="/a/<%= post._id %>"><%= post.title %></a>
 			</p> 
-			<small>
+			<small class='j-href-color-gray'>
                 作者：<a href="/p?name=<%= post.name %>"><%= post.name %></a> |
 				日期：<%= post.time.minute %>
                 <% if (user && user.name == post.name) { %>

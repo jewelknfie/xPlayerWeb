@@ -1,6 +1,7 @@
 var mongodb = require('./db')
   , markdown = require('markdown').markdown
-  , ObjectID = require('mongodb').ObjectID;
+  , ObjectID = require('mongodb').ObjectID
+  , Common = require('../models/common.js');
 
 function Post(name, title, productor, classification, videoName, post) {
 	this.name = name;
@@ -14,18 +15,7 @@ function Post(name, title, productor, classification, videoName, post) {
 module.exports = Post;
 
 function getTime() {
-	
-	var date = new Date();
-	//存储各种时间格式，方便以后扩展
-	return {
-		date: date,
-		year: date.getFullYear(),
-		month: date.getFullYear() + "-" + (date.getMonth() + 1),
-		day: date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate(),
-		minute: date.getFullYear() + "-" + (date.getMonth() + 1) + "-" + date.getDate() + " " +
-				date.getHours() + ":" + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes())
-	};
-	
+	return Common.getTime();
 }
 
 //存储用户信息
@@ -287,7 +277,7 @@ Post.remove = function(name, keyId, callback) {
             }
             //删除文档
             collection.remove({
-                "name": post.name,
+                "name": name,
                 "_id": new ObjectID(keyId)
             }, {
                 w:1

@@ -3,12 +3,15 @@ var crypto = require('crypto')
 		, Post = require('../models/post.js')
 		, fs = require('fs')
 		, productors = require('../models/productors.js')
-		, Comment = require('../models/comment.js');
+		, Comment = require('../models/comment.js')
+		, VisitLog = require('../models/visitlog.js');
 /*
  * GET home page.
  */
 
 module.exports = function(app) {
+
+//	app.all("*", recordLog);
 
 	app.get('/', function(req, res) {
 		res.redirect("/p?productor=0&classification=0");
@@ -405,6 +408,15 @@ module.exports = function(app) {
 		req.flash('success', '登出成功!');
 		res.redirect('/');//登出成功后跳转到主页
 	});
+
+	function recordLog(req, res, next) {
+		new VisitLog(req.connection.remoteAddress, req.session.user).record(function(err) {
+			if (err) {
+				console.log(err);
+			}
+		});
+		next();
+	}
 
 	function checkLogin(req, res, next) {
 		if (!req.session.user) {
