@@ -287,7 +287,7 @@ Post.remove = function(name, keyId, callback) {
             }
             //删除文档
             collection.remove({
-                "name": post.name,
+                "name": name,
                 "_id": new ObjectID(keyId)
             }, {
                 w:1
