@@ -91,3 +91,36 @@ a {
     padding-top: 30px;
     border:  1px solid #EEE;
 }
+
+.j-login {
+    padding: 20px;
+    padding-top: 20px;
+    /*margin-top: 30px;*/
+    background-color: #fff;
+    /*-webkit-border-radius: 6px;*/
+    /*-moz-border-radius: 6px;*/
+    /*border-radius: 6px;*/
+    -webkit-box-shadow: 0 1px 4px rgba(0,0,0,.065);
+    -moz-box-shadow: 0 1px 4px rgba(0,0,0,.065);
+    box-shadow: 0 1px 4px rgba(0,0,0,.065);
+    border-left: 1px solid #EEE;
+}
+
+.j-login-header {
+    position: relative;
+    padding: 10px 20px;
+    margin: 0;
+    color: #fff;
+    text-shadow: 0 -1px 0 rgba(0,0,0,0.5);
+    background-color: #6c8393;
+    background-image: -moz-linear-gradient(#7f95a5, #6c8393);
+    background-image: -webkit-linear-gradient(#7f95a5, #6c8393);
+    background-image: linear-gradient(#7f95a5, #6c8393);
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    /*border-radius: 6px;*/
+    background-repeat: repeat-x;
+    border: 1px solid #6e8290;
+    border-bottom-color: #586873;
+    border-radius: 3px 3px 0 0;
+}
