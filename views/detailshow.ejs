@@ -25,13 +25,13 @@
 		<!--<blockquote>-->
         <div class="j-search-result">
 			<p>
-                <i class="icon-briefcase"></i>  <a href="/a/<%= post._id %>"><%= post.title %></a>
+                <i class="icon-briefcase"></i>  <a href="/a/<%= post._id %>" target="_blank"><%= post.title %></a>
 			</p> 
 			<small class='j-href-color-gray'>
                 作者：<a href="/p?name=<%= post.name %>"><%= post.name %></a> |
 				日期：<%= post.time.minute %>
                 <% if (user && user.name == post.name) { %>
-                | <span><a class="edit" href="/edit/<%= post._id %>">编辑</a></span>
+                | <span><a class="edit" href="/edit/<%= post._id %>" target="_blank">编辑</a></span>
                 | <span><a class="edit" href="/remove/<%= post._id %>">删除</a></span>
 
                 <% if (post.sticky_time) { %>

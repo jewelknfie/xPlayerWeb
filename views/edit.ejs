@@ -28,7 +28,7 @@
             <div class="controls">
                 <select name="classification" >
                     <% classificationList.forEach(function (classification, index) { %>
-                    <option value="<%= index %>" <% if (post.productor == index) { %> selected <% } %> > <%= classification %></option>
+                    <option value="<%= index %>" <% if (post.classification == index) { %> selected <% } %> > <%= classification %></option>
                     <% }) %>
                 </select>
             </div>

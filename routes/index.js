@@ -14,6 +14,7 @@ module.exports = function(app) {
 //	app.all("*", recordLog);
 
 	app.get('/', function(req, res) {
+//        recordLog(req, res);
 		res.redirect("/p?productor=0&classification=0");
 	});
 
@@ -22,97 +23,33 @@ module.exports = function(app) {
             return res.redirect("/");
         }
 		var page = req.query.p ? parseInt(req.query.p) : 1;
-		Post.getTen(req.query.name, req.query.productor, req.query.classification, req.query.day, req.query.title, req.query.searchType, req.query.keyword, page, function(err, posts, total) {
-			if (err) {
-				posts = [];
-			}
-			res.render('detailshow', {
-				title: 'show',
-				user: req.session.user,
-				posts: posts,
-				page: page,
-                keyword: req.query.keyword ? req.query.keyword : "",
-				isFirstPage: (page - 1) == 0,
-				isLastPage: ((page - 1) * 10 + posts.length) == total,
-				curProductor: req.query.productor,
-				curClassification: req.query.classification,
-				productorList: productors.productorList(),
-				classificationList: productors.classificationList(),
-				success: req.flash('success').toString(),
-				error: req.flash('error').toString()
-			});
-		});
+        try
+        {
+            Post.getTen(req.query.name, req.query.productor, req.query.classification, req.query.day, req.query.title, req.query.searchType, req.query.keyword, page, function(err, posts, total) {
+                if (err) {
+                    posts = [];
+                }
+                res.render('detailshow', {
+                    title: 'show',
+                    user: req.session.user,
+                    posts: posts,
+                    page: page,
+                    keyword: req.query.keyword ? req.query.keyword : "",
+                    isFirstPage: (page - 1) == 0,
+                    isLastPage: ((page - 1) * 10 + posts.length) == total,
+                    curProductor: req.query.productor,
+                    curClassification: req.query.classification,
+                    productorList: productors.productorList(),
+                    classificationList: productors.classificationList(),
+                    success: req.flash('success').toString(),
+                    error: req.flash('error').toString()
+                });
+            });
+        } catch (error) {
+            res.redirect('back');
+        }
+
 	});
-	
-//	app.post('/p', function(req, res) {
-//        var page = req.query.p ? parseInt(req.query.p) : 1;
-//		Post.getTen(req.body.name, req.query.productor, req.query.classification, req.query.day, req.body.title, req.query.searchType, page, function(err, posts, total) {
-//			if (err) {
-//				posts = [];
-//			}
-//			res.render('detailshow', {
-//				title: 'show',
-//				user: req.session.user,
-//				posts: posts,
-//				page: page,
-//				isFirstPage: (page - 1) == 0,
-//				isLastPage: ((page - 1) * 10 + posts.length) == total,
-//				curProductor: req.params.productor,
-//				curClassification: req.params.classification,
-//				productorList: productors.productorList(),
-//				classificationList: productors.classificationList(),
-//				success: req.flash('success').toString(),
-//				error: req.flash('error').toString()
-//			});
-//		});
-//	});
-	
-//	app.get('/p/:productor/:classification', function(req, res) {
-//        var page = req.query.p ? parseInt(req.query.p) : 1;
-//		Post.getTen(null, req.params.productor, req.params.classification, null, null,  page, function(err, posts, total) {
-//			if (err) {
-//				posts = [];
-//			}
-//			res.render('detailshow', {
-//				title: 'show',
-//				user: req.session.user,
-//				posts: posts,
-//                page: page,
-//                isFirstPage: (page - 1) == 0,
-//                isLastPage: ((page - 1) * 10 + posts.length) == total,
-//				curProductor: req.params.productor,
-//				curClassification: req.params.classification,
-//				productorList: productors.productorList(),
-//				classificationList: productors.classificationList(),
-//				success: req.flash('success').toString(),
-//				error: req.flash('error').toString()
-//			});
-//		});
-//	});
-//
-//	app.get('/p/:productor/:classification/:username', function(req, res) {
-//        var page = req.query.p ? parseInt(req.query.p) : 1;
-//		Post.getTen(req.params.username, req.params.productor, req.params.classification, null, null,  page, function(err, posts, total) {
-//			if (err) {
-//				posts = [];
-//			}
-//
-//			res.render('detailshow', {
-//				title: 'show',
-//				user: req.session.user,
-//				posts: posts,
-//                page: page,
-//                isFirstPage: (page - 1) == 0,
-//                isLastPage: ((page - 1) * 10 + posts.length) == total,
-//				curProductor: req.params.productor,
-//				curClassification: req.params.classification,
-//				productorList: productors.productorList(),
-//				classificationList: productors.classificationList(),
-//				success: req.flash('success').toString(),
-//				error: req.flash('error').toString()
-//			});
-//		});
-//	});
 
     app.get('/edit/:keyId', checkLogin);
     app.get('/edit/:keyId', function (req, res) {
@@ -226,31 +163,9 @@ module.exports = function(app) {
                 return res.redirect('back');
             }
             req.flash('success', '删除成功!');
-            res.redirect('/');
+            return res.redirect('back');
         });
     });
-
-//	app.post('/s', function(req, res) {
-//		Post.search( req.body.searchTitle, function(err, posts) {
-//			if (err) {
-//				posts = [];
-//			}
-//			res.render('detailshow', {
-//				title: 'xPlayerWeb',
-//				user: req.session.user,
-//				posts: posts,
-//                page: 1,
-//                isFirstPage: true,
-//                isLastPage: true,
-//				curProductor: req.params.productor,
-//				curClassification: req.params.classification,
-//				productorList: productors.productorList(),
-//				classificationList: productors.classificationList(),
-//				success: req.flash('success').toString(),
-//				error: req.flash('error').toString()
-//			});
-//		});
-//	});
 
 	app.get('/login', checkNotLogin);
 	app.get('/login', function(req, res) {
@@ -409,13 +324,13 @@ module.exports = function(app) {
 		res.redirect('/');//登出成功后跳转到主页
 	});
 
-	function recordLog(req, res, next) {
-		new VisitLog(req.connection.remoteAddress, req.session.user).record(function(err) {
+	function recordLog(req, res) {
+		new VisitLog(req.connection.remoteAddress, req.session.user.name).record(function(err) {
 			if (err) {
 				console.log(err);
 			}
+//            next();
 		});
-		next();
 	}
 
 	function checkLogin(req, res, next) {
@@ -433,7 +348,10 @@ module.exports = function(app) {
 		}
 		next();
 	}
-	
-	
+
+//    process.on('uncaughtException', function (err, res) {
+//        console.error((new Date).toUTCString() + ' uncaughtException:', err.message)
+//        return res.redirect('back');
+//    })
 
 }

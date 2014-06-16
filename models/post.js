@@ -137,16 +137,12 @@ Post.getOne = function(name, keyId, needMarkdown, callback) {
                 query.name = name;
             }
 			query._id = new ObjectID(keyId);
-			console.log(query);
 			collection.findOne(query, function(err, doc) {
 				mongodb.close();
 				if (err) {
 					return callback(err);//失败！返回 err
 				}
 				if (doc && needMarkdown) {
-                    console.log(doc.post);
-                    console.log(markdown.toHTML(doc.post));
-                    console.log(markdown.toHTMLTree(doc.post));
 					doc.post = markdown.toHTML(doc.post);
                     doc.comments.forEach(function (comment) {
                         comment.content = markdown.toHTML(comment.content);
